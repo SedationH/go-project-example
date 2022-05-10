@@ -2,22 +2,18 @@ package main
 
 import (
 	"fmt"
-	"io"
+	"go-project-example/cotroller"
 	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	f, _ := os.Create("gin.log")
-	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
-
 	r := gin.Default()
 	r.GET("/community/page/get/:id", func(c *gin.Context) {
 		topicId := c.Param("id")
-		c.JSON(200, gin.H{
-			"message": topicId,
-		})
+		data := cotroller.QueryPageInfo(topicId)
+		c.JSON(200, data)
 	})
 	err := r.Run()
 	if err != nil {
