@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"go-project-example/repository"
 	"sync"
 )
 
@@ -11,8 +12,8 @@ import (
 // }
 
 type PageInfo struct {
-	Topic    string
-	PostList string
+	Topic    *repository.Topic
+	PostList []*repository.Post
 }
 
 func QueryPageInfo(topicId int64) (*PageInfo, error) {
@@ -23,10 +24,8 @@ type QueryPageInfoFlow struct {
 	topicId  int64
 	pageInfo *PageInfo
 
-	// topic *repository.Topic
-	// posts []*repository.Post
-	topic string
-	posts string
+	topic *repository.Topic
+	posts []*repository.Post
 }
 
 func NewQueryPageInfoFlow(topId int64) *QueryPageInfoFlow {
@@ -61,12 +60,12 @@ func (f *QueryPageInfoFlow) prepareInfo() error {
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		topic := "topic content"
+		topic := repository.NewTopicDaoInstance().QueryTopicById(f.topicId)
 		f.topic = topic
 	}()
 	go func() {
 		defer wg.Done()
-		posts := "posts content"
+		posts := repository.NewPostDaoInstance().QueryPostsByParentId(f.topicId)
 		f.posts = posts
 	}()
 
