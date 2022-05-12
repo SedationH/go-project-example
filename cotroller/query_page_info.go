@@ -33,3 +33,18 @@ func QueryPageInfo(topicIdStr string) *PageData {
 		Data: pageInfo,
 	}
 }
+
+func AddNewPage(newPageInfo *service.PageInfo) *PageData {
+	err := service.AddNewPage(newPageInfo)
+	if err != nil {
+		return &PageData{
+			Code: -2,
+			Msg:  err.Error(),
+		}
+	}
+	return &PageData{
+		Code: 0,
+		Msg:  "success",
+		Data: newPageInfo,
+	}
+}

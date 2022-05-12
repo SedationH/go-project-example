@@ -81,3 +81,8 @@ func (f *QueryPageInfoFlow) packPageInfo() error {
 
 	return nil
 }
+
+func AddNewPage(newPageInfo *PageInfo) error {
+	// TODO
+	return nil
+}

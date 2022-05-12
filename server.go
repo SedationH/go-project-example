@@ -20,8 +20,8 @@ func main() {
 	r := gin.Default()
 	r.GET("/community/page/get/:id", func(c *gin.Context) {
 		topicId := c.Param("id")
-		data := cotroller.QueryPageInfo(topicId)
-		c.JSON(200, data)
+		pageData := cotroller.QueryPageInfo(topicId)
+		c.JSON(http.StatusOK, pageData)
 	})
 	r.POST("/community/page/post", func(c *gin.Context) {
 		b, err := c.GetRawData()
@@ -34,11 +34,11 @@ func main() {
 		err = json.Unmarshal(b, &pageInfo)
 		if err != nil {
 			log.Println("Unmarshal() failed", string(b))
+			c.JSON(http.StatusBadRequest, nil)
 			return
 		}
-		printPageInfo, _ := json.Marshal(pageInfo)
-		log.Printf("%#v\n", string(printPageInfo))
-		c.JSON(200, pageInfo)
+		pageData := cotroller.AddNewPage(&pageInfo)
+		c.JSON(http.StatusOK, pageData)
 	})
 
 	err := r.Run()
