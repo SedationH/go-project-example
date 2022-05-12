@@ -16,3 +16,7 @@
 然后是视图层
 
 ![image-20220512104447590](https://s2.loli.net/2022/05/12/IWnJZ6FANYx5KLt.png)
+
+逻辑层，注意 PostList 中的 parentID 和 topic 的 id产生了关联
+
+![image-20220512110504773](https://s2.loli.net/2022/05/12/IrqC4anfgHVsvWE.png)

@@ -25,6 +25,12 @@ func NewTopicDaoInstance() *TopicDAO {
 		})
 	return topicDAO
 }
+
 func (*TopicDAO) QueryTopicById(id int64) *Topic {
 	return topicIndexMap[id]
+}
+
+func (*TopicDAO) AddNewTopic(topic *Topic) (int64, error) {
+	topic.Id = 3
+	return 3, nil
 }

@@ -83,6 +83,13 @@ func (f *QueryPageInfoFlow) packPageInfo() error {
 }
 
 func AddNewPage(newPageInfo *PageInfo) error {
-	// TODO
+	id, err := repository.NewTopicDaoInstance().AddNewTopic(newPageInfo.Topic)
+	if err != nil {
+		return err
+	}
+	err = repository.NewPostDaoInstance().AddNewPost(newPageInfo.PostList, id)
+	if err != nil {
+		return err
+	}
 	return nil
 }

@@ -26,6 +26,14 @@ func NewPostDaoInstance() *PostDAO {
 		})
 	return postDAO
 }
+
 func (*PostDAO) QueryPostsByParentId(parentId int64) []*Post {
 	return postIndexMap[parentId]
+}
+
+func (*PostDAO) AddNewPost(postList []*Post, parentId int64) error {
+	for _, post := range postList {
+		post.ParentId = parentId
+	}
+	return nil
 }
