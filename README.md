@@ -4,7 +4,7 @@
 
 [ER 图](https://app.diagrams.net/#G1LZJdPQrZxJDsCtTSmlu8BvFkQWEz0B8L)
 
-![image-20220510090610295](https://s2.loli.net/2022/05/10/UAt2pEJmeQvKoOP.png)
+![](https://s2.loli.net/2022/05/12/wGYj5y8A1cvJE7B.png)
 
 # v1
 
