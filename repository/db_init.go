@@ -7,8 +7,10 @@ import (
 )
 
 var (
-	topicIndexMap map[int64]*Topic
-	postIndexMap  map[int64][]*Post
+	topicIndexMap *RWTopicMap
+	postIndexMap  *RWPostMap
+	maxTopicId    int64
+	maxPostId     int64
 )
 
 func Init(filePath string) error {
@@ -37,8 +39,11 @@ func initTopicIndexMap(filePath string) error {
 			return err
 		}
 		topicTmpMap[topic.Id] = &topic
+		if maxTopicId < topic.Id {
+			maxTopicId = topic.Id
+		}
 	}
-	topicIndexMap = topicTmpMap
+	topicIndexMap = NewRWTopicMap(topicTmpMap)
 	return nil
 }
 
@@ -55,6 +60,9 @@ func initPostIndexMap(filePath string) error {
 		if err := json.Unmarshal([]byte(text), &post); err != nil {
 			return err
 		}
+		if maxPostId < post.Id {
+			maxPostId = post.Id
+		}
 		posts, ok := postTmpMap[post.ParentId]
 		if !ok {
 			postTmpMap[post.ParentId] = []*Post{&post}
@@ -63,6 +71,6 @@ func initPostIndexMap(filePath string) error {
 		posts = append(posts, &post)
 		postTmpMap[post.ParentId] = posts
 	}
-	postIndexMap = postTmpMap
+	postIndexMap = NewRWPostMap(postTmpMap)
 	return nil
 }

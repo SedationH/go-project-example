@@ -1,7 +1,10 @@
 package repository
 
 import (
+	"encoding/json"
+	"os"
 	"sync"
+	"time"
 )
 
 type Topic struct {
@@ -27,10 +30,25 @@ func NewTopicDaoInstance() *TopicDAO {
 }
 
 func (*TopicDAO) QueryTopicById(id int64) *Topic {
-	return topicIndexMap[id]
+	topic, _ := topicIndexMap.Get(id)
+	return topic
 }
 
 func (*TopicDAO) AddNewTopic(topic *Topic) (int64, error) {
-	topic.Id = 3
-	return 3, nil
+	maxTopicId++
+	topic.Id = maxTopicId
+	topic.CreateTime = time.Now().Unix()
+	topicIndexMap.Set(topic.Id, topic)
+	f, err := os.OpenFile("./data/topic", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return -1, err
+	}
+	defer f.Close()
+	f.WriteString("\n")
+	b, _ := json.Marshal(topic)
+	_, err = f.Write(b)
+	if err != nil {
+		return -1, err
+	}
+	return maxTopicId, nil
 }
