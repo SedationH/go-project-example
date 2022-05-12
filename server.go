@@ -1,9 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"go-project-example/cotroller"
 	"go-project-example/repository"
+	"go-project-example/service"
+	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -20,9 +23,27 @@ func main() {
 		data := cotroller.QueryPageInfo(topicId)
 		c.JSON(200, data)
 	})
+	r.POST("/community/page/post", func(c *gin.Context) {
+		b, err := c.GetRawData()
+		if err != nil {
+			log.Println("GetRawData() failed")
+			c.JSON(http.StatusBadRequest, nil)
+			return
+		}
+		var pageInfo service.PageInfo
+		err = json.Unmarshal(b, &pageInfo)
+		if err != nil {
+			log.Println("Unmarshal() failed", string(b))
+			return
+		}
+		printPageInfo, _ := json.Marshal(pageInfo)
+		log.Printf("%#v\n", string(printPageInfo))
+		c.JSON(200, pageInfo)
+	})
+
 	err := r.Run()
 	if err != nil {
-		fmt.Println("Gin 启动失败")
+		log.Println("Gin 启动失败")
 		os.Exit(-1)
 	}
 }
