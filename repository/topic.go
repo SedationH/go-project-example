@@ -1,17 +1,16 @@
 package repository
 
 import (
-	"encoding/json"
-	"os"
+	"log"
 	"sync"
 	"time"
 )
 
 type Topic struct {
-	Id         int64  `json:"id"`
-	Title      string `json:"title"`
-	Content    string `json:"content"`
-	CreateTime int64  `json:"create_time"`
+	Id         int64     `gorm:"column:id"`
+	Title      string    `gorm:"column:title"`
+	Content    string    `gorm:"column:content"`
+	CreateTime time.Time `gorm:"column:create_time"`
 }
 type TopicDAO struct {
 }
@@ -29,26 +28,22 @@ func NewTopicDaoInstance() *TopicDAO {
 	return topicDAO
 }
 
-func (*TopicDAO) QueryTopicById(id int64) *Topic {
-	topic, _ := topicIndexMap.Get(id)
-	return topic
+func (*TopicDAO) QueryTopicById(id int64) (*Topic, error) {
+	var topic Topic
+	err := db.Where("id = ?", id).Find(&topic).Error
+	if err != nil {
+		log.Println("find topic by id err:" + err.Error())
+		return nil, err
+	}
+	return &topic, nil
 }
 
 func (*TopicDAO) AddNewTopic(topic *Topic) (int64, error) {
-	maxTopicId++
-	topic.Id = maxTopicId
-	topic.CreateTime = time.Now().Unix()
-	topicIndexMap.Set(topic.Id, topic)
-	f, err := os.OpenFile("./data/topic", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	topic.CreateTime = time.Now()
+	result := db.Create(topic)
+	err := result.Error
 	if err != nil {
-		return -1, err
+		log.Println("insert post err:" + err.Error())
 	}
-	defer f.Close()
-	f.WriteString("\n")
-	b, _ := json.Marshal(topic)
-	_, err = f.Write(b)
-	if err != nil {
-		return -1, err
-	}
-	return maxTopicId, nil
+	return topic.Id, err
 }

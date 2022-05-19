@@ -56,18 +56,33 @@ func (f *QueryPageInfoFlow) checkParam() error {
 
 func (f *QueryPageInfoFlow) prepareInfo() error {
 	// 去并行获取 topic 和 post 信息
+	var topicErr, postErr error
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		topic := repository.NewTopicDaoInstance().QueryTopicById(f.topicId)
+		topic, err := repository.NewTopicDaoInstance().QueryTopicById(f.topicId)
+		if err != nil {
+			topicErr = err
+			return
+		}
 		f.topic = topic
 	}()
 	go func() {
 		defer wg.Done()
-		posts := repository.NewPostDaoInstance().QueryPostsByParentId(f.topicId)
+		posts, err := repository.NewPostDaoInstance().QueryPostsByParentId(f.topicId)
+		if err != nil {
+			postErr = err
+			return
+		}
 		f.posts = posts
 	}()
+	if topicErr != nil {
+		return topicErr
+	}
+	if postErr != nil {
+		return postErr
+	}
 
 	wg.Wait()
 	return nil

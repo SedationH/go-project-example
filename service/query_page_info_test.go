@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"go-project-example/repository"
+	"log"
 	"os"
 	"testing"
 
@@ -11,7 +12,8 @@ import (
 
 // 注意这里是 m
 func TestMain(m *testing.M) {
-	repository.Init("../data/")
+	log.Println("先执行这里")
+	repository.Init()
 	os.Exit(m.Run())
 }
 

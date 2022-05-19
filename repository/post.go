@@ -1,17 +1,16 @@
 package repository
 
 import (
-	"encoding/json"
-	"os"
+	"log"
 	"sync"
 	"time"
 )
 
 type Post struct {
-	Id         int64  `json:"id"`
-	ParentId   int64  `json:"parent_id"`
-	Content    string `json:"content"`
-	CreateTime int64  `json:"create_time"`
+	Id         int64     `json:"id"`
+	ParentId   int64     `json:"parent_id"`
+	Content    string    `json:"content"`
+	CreateTime time.Time `json:"create_time"`
 }
 
 type PostDAO struct {
@@ -30,33 +29,25 @@ func NewPostDaoInstance() *PostDAO {
 	return postDAO
 }
 
-func (*PostDAO) QueryPostsByParentId(parentId int64) []*Post {
-	v, _ := postIndexMap.Get(parentId)
-	return v
+func (*PostDAO) QueryPostsByParentId(parentId int64) ([]*Post, error) {
+	var posts []*Post
+	err := db.Where("parent_id = ?", parentId).Find(&posts).Error
+	if err != nil {
+		log.Println("find posts by parent_id err:" + err.Error())
+		return nil, err
+	}
+	return posts, nil
 }
 
 func (*PostDAO) AddNewPost(postList []*Post, parentId int64) error {
 	for _, post := range postList {
-		maxPostId++
-		post.Id = maxPostId
+		post.CreateTime = time.Now()
 		post.ParentId = parentId
-		post.CreateTime = time.Now().Unix()
 	}
-	postIndexMap.Set(parentId, postList)
-	f, err := os.OpenFile("./data/post", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	result := db.Create(postList)
+	err := result.Error
 	if err != nil {
-		return err
+		log.Println("insert post err:" + err.Error())
 	}
-	defer f.Close()
-
-	var b []byte
-	for _, post := range postList {
-		f.WriteString("\n")
-		b, _ = json.Marshal(post)
-		_, err = f.Write(b)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return err
 }

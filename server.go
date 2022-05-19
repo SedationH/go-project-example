@@ -49,7 +49,7 @@ func main() {
 }
 
 func Init(filePath string) error {
-	if err := repository.Init(filePath); err != nil {
+	if err := repository.Init(); err != nil {
 		return err
 	}
 	return nil
